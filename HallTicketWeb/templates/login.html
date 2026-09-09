@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Access | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- Futuristic Background Animation --- */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #000000, #1a1a2e, #16213e, #0f3460);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Glassmorphism Card --- */
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05); /* Very transparent */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); /* Deep shadow */
+            backdrop-filter: blur(12px); /* Blur effect */
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: floatIn 1s ease-out;
+            margin: 20px; /* Spacing on mobile */
+        }
+
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Typography --- */
+        .login-title {
+            color: #ffffff;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5); /* Neon text glow */
+        }
+
+        /* --- Futuristic Inputs --- */
+        .input-group-text {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #00d4ff; /* Cyan Icon */
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0;
+            color: #fff;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            box-shadow: none;
+            border-bottom: 2px solid #00d4ff; /* Neon Cyan Border */
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- Neon Button --- */
+        .btn-neon {
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .btn-neon:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.6);
+            color: white;
+        }
+
+        .text-muted-futuristic {
+            color: rgba(255, 255, 255, 0.4) !important;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Flash Messages */
+        .alert {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+            color: #ff6b6b;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2 class="login-title"><i class="fas fa-shield-alt me-2"></i>Admin Access</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-dismissible fade show mb-4" role="alert">
+                  <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="input-group mb-4">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input type="text" name="username" class="form-control" placeholder="Username" required autocomplete="off">
+            </div>
+
+            <div class="input-group mb-4">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button class="btn btn-neon btn-lg" type="submit">
+                    SECURE LOGIN <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </form>
+
+        <div class="text-muted-futuristic">
+            Authorized Personnel Only <br> System v3.0
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

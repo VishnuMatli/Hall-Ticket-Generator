@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MITS | Pandora Link</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Palette: Pandora Night */
+      --pandora-dark: #020b14;
+      --pandora-teal: #00f0ff;
+      --pandora-blue: #2979ff;
+      --soul-tree: #d500f9;
+      --biolum-green: #00e676;
+      
+      /* Materials */
+      --glass-hud: rgba(2, 11, 20, 0.65);
+      --glass-border: rgba(0, 240, 255, 0.3);
+      --holo-glow: 0 0 15px rgba(0, 240, 255, 0.2);
+      
+      /* Typography */
+      --font-tribal: 'Cinzel', serif;
+      --font-tech: 'Rajdhani', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-tech);
+      background-color: var(--pandora-dark);
+      color: #e0f7fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* --- ATMOSPHERE: The Bioluminescent Forest --- */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(41, 121, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(213, 0, 249, 0.1) 0%, transparent 40%),
+        linear-gradient(to bottom, #000408, #05101a);
+      z-index: -2;
+    }
+
+    /* Floating Woodsprites (Atokirina) Animation */
+    .woodsprites {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      background-image: 
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(rgba(255,255,255,0.7) 1px, transparent 1px);
+      background-size: 50px 50px;
+      background-position: 0 0, 25px 25px;
+      opacity: 0.3;
+      animation: floatUp 20s linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      20% { opacity: 0.5; }
+      80% { opacity: 0.5; }
+      100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+    }
+
+    .main-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      flex: 1;
+      padding: 3rem 1.5rem;
+    }
+
+    /* --- HEADER: RDA vs Na'vi --- */
+    .app-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-top: 1rem;
+      position: relative;
+    }
+    
+    .logo-container img {
+      filter: drop-shadow(0 0 10px var(--pandora-teal));
+    }
+
+    .univ-title {
+      font-family: var(--font-tribal);
+      font-weight: 700;
+      font-size: 2rem;
+      background: linear-gradient(to right, #fff, var(--pandora-teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+    }
+    
+    .division-badge {
+      font-family: var(--font-tech);
+      font-size: 0.9rem;
+      color: var(--pandora-blue);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--pandora-blue);
+      display: inline-block;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+    }
+
+    /* --- HOLOGRAPHIC CARD --- */
+    .holo-card {
+      background: var(--glass-hud);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      box-shadow: var(--holo-glow);
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Glowing Border Effect */
+    .holo-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--pandora-teal), transparent);
+    }
+
+    .card-header-holo {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, rgba(0,240,255,0.05), transparent);
+    }
+
+    .holo-title {
+      font-family: var(--font-tribal);
+      font-size: 1.1rem;
+      color: var(--pandora-teal);
+      letter-spacing: 1px;
+    }
+
+    .card-body-holo { padding: 2.5rem; }
+
+    /* --- INPUTS: Projected Light --- */
+    .form-label {
+      font-family: var(--font-tech);
+      font-size: 0.85rem;
+      color: var(--pandora-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .form-control, .form-select {
+      background: rgba(0, 20, 40, 0.6) !important;
+      border: 1px solid rgba(0, 240, 255, 0.2) !important;
+      color: #fff !important;
+      font-family: var(--font-tech);
+      font-size: 1.1rem; /* Larger for HUD feel */
+      border-radius: 4px;
+      padding: 12px 16px;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--pandora-teal) !important;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1) !important;
+      background: rgba(0, 30, 50, 0.8) !important;
+    }
+
+    /* Readonly inputs look like fixed data readouts */
+    input[readonly] {
+      background: rgba(255, 255, 255, 0.03) !important;
+      border-color: transparent !important;
+      color: var(--text-muted) !important;
+      font-style: italic;
+    }
+
+    .form-select option {
+      background-color: #05101a;
+      color: var(--pandora-teal);
+    }
+
+    /* --- BUTTONS: Bioluminescence --- */
+    .btn-biolum {
+      background: transparent;
+      border: 1px solid var(--pandora-teal);
+      color: var(--pandora-teal);
+      font-family: var(--font-tech);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 12px 24px;
+      border-radius: 50px;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .btn-biolum::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 0%; height: 100%;
+      background: var(--pandora-teal);
+      transition: all 0.4s ease;
+      z-index: -1;
+      border-radius: 50px;
+    }
+
+    .btn-biolum:hover {
+      color: #000;
+      box-shadow: 0 0 20px var(--pandora-teal);
+    }
+    .btn-biolum:hover::before { width: 100%; }
+
+    .btn-eywa {
+      width: 100%;
+      background: linear-gradient(135deg, var(--pandora-blue), var(--soul-tree));
+      border: none;
+      color: #fff;
+      font-family: var(--font-tribal);
+      font-weight: 700;
+      padding: 18px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      margin-top: 1rem;
+      position: relative;
+      box-shadow: 0 0 15px rgba(213, 0, 249, 0.4);
+      transition: all 0.3s;
+    }
+
+    .btn-eywa:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(213, 0, 249, 0.7);
+      filter: brightness(1.2);
+    }
+
+    /* --- PHOTO & EXTRAS --- */
+    .photo-pod {
+      border: 1px solid var(--pandora-blue);
+      background: rgba(0,0,0,0.4);
+      padding: 15px;
+      border-radius: 12px;
+      position: relative;
+      text-align: center;
+    }
+    
+    /* Corner Accents */
+    .photo-pod::before {
+      content: ''; position: absolute; top: -1px; left: -1px;
+      width: 15px; height: 15px; border-top: 2px solid var(--pandora-teal); border-left: 2px solid var(--pandora-teal);
+      border-radius: 4px 0 0 0;
+    }
+    .photo-pod::after {
+      content: ''; position: absolute; bottom: -1px; right: -1px;
+      width: 15px; height: 15px; border-bottom: 2px solid var(--pandora-teal); border-right: 2px solid var(--pandora-teal);
+      border-radius: 0 0 4px 0;
+    }
+
+    .transparency-grid {
+      background-color: #020b14;
+      background-image: 
+        linear-gradient(45deg, #0f2027 25%, transparent 25%), 
+        linear-gradient(-45deg, #0f2027 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #0f2027 75%), 
+        linear-gradient(-45deg, transparent 75%, #0f2027 75%);
+      background-size: 20px 20px;
+      min-height: 200px;
+      display: flex; justify-content: center; align-items: center;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #photoPreview { max-height: 190px; }
+
+    /* Curriculum List */
+    #subjectsContainer {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--pandora-blue);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    
+    .subject-pill {
+      background: rgba(41, 121, 255, 0.1);
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 10px;
+      transition: 0.2s;
+    }
+    .subject-pill:hover {
+      background: rgba(41, 121, 255, 0.2);
+      border-color: var(--pandora-teal);
+      box-shadow: 0 0 10px rgba(0,240,255,0.1);
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--pandora-teal);
+      border-color: var(--pandora-teal);
+      box-shadow: 0 0 10px var(--pandora-teal);
+    }
+
+    /* Footer */
+    .app-footer {
+      border-top: 1px solid rgba(0, 240, 255, 0.2);
+      padding-top: 2rem;
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--pandora-blue);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    /* Modal */
+    .modal-content {
+      background: #020b14;
+      border: 1px solid var(--pandora-teal);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+    }
+    .modal-header { border-bottom: 1px solid var(--pandora-blue); }
+    .modal-footer { border-top: 1px solid var(--pandora-blue); }
+    .btn-close { filter: invert(1) drop-shadow(0 0 5px var(--pandora-teal)); }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="woodsprites"></div>
+
+  <header class="app-header">
+    <div class="container">
+      <div class="logo-container mb-2">
+        <img src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png" alt="Logo" height="70">
+      </div>
+      <span class="division-badge">MITS / Secure Uplink</span>
+      <h1 class="univ-title">Examination Portal</h1>
+    </div>
+  </header>
+
+  <div class="container main-container">
+
+    <div class="holo-card">
+      <div class="card-header-holo">
+        <span class="holo-title"><i class="bi bi-person-bounding-box me-2"></i> DNA // ID VERIFICATION</span>
+      </div>
+      <div class="card-body-holo">
+        <form id="fetchForm" class="row g-4 align-items-end">
+          <div class="col-md-5">
+            <label class="form-label">Identity Code (Roll No)</label>
+            <input type="text" class="form-control" id="roll_number_fetch" placeholder="e.g. 24695A4006" required style="font-family: monospace; letter-spacing: 2px; color: var(--pandora-teal) !important;">
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Genesis Date (DOB)</label>
+            <input type="date" class="form-control" id="dob_fetch" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-biolum w-100">
+              Connect
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="holo-card">
+      <div class="card-header-holo">
+        <span class="holo-title"><i class="bi bi-cpu me-2"></i> HALL TICKET CONFIGURATION</span>
+      </div>
+      <div class="card-body-holo">
+
+        <form id="hallForm" action="/generate-halltkt" method="POST" enctype="multipart/form-data" target="_blank">
+          <div class="row g-5">
+
+            <div class="col-lg-8">
+              
+              <div class="mb-4 pb-2" style="border-bottom: 1px dashed var(--pandora-blue);">
+                <label class="form-label text-white" style="letter-spacing: 2px;">CANDIDATE BIOMETRICS</label>
+              </div>
+              
+              <div class="row g-3 mb-5">
+                <div class="col-md-6">
+                  <label class="form-label">Roll Number</label>
+                  <input type="text" name="roll_number" id="roll_number" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Name</label>
+                  <input type="text" name="name" id="name" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Clan / Guardian</label>
+                  <input type="text" name="father_name" id="father_name" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Genesis</label>
+                  <input type="date" name="dob" id="dob" class="form-control" readonly>
+                </div>
+              </div>
+
+              <div class="mb-4 pb-2" style="border-bottom: 1px dashed var(--pandora-blue);">
+                <label class="form-label text-white" style="letter-spacing: 2px;">ACADEMIC PARAMETERS</label>
+              </div>
+
+              <div class="row g-3 mb-5">
+                <div class="col-md-4">
+                  <label class="form-label">Mode</label>
+                  <select name="mode" id="mode" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="Autonomous">Autonomous</option>
+                    <option value="University">University</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Sector (Dept)</label>
+                  <select name="department" id="department" class="form-select">
+                    <option value="">Select...</option>
+                    <option value="Networks">Networks</option>
+                    <option value="AI & ML">AI & ML</option>
+                    <option value="AI">AI</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Cyber Security">Cyber Security</option>
+                    <option value="Civil">Civil</option>
+                    <option value="EEE">EEE</option>
+                    <option value="ECE">ECE</option>
+                    <option value="Mechanical">Mechanical</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Regulation</label>
+                  <select name="regulation" id="regulation" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="R23">R23</option>
+                    <option value="R20">R20</option>
+                    <option value="R19">R19</option>
+                    <option value="R18">R18</option>
+                  </select>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Cycle (Year)</label>
+                  <select name="year" id="year" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="1">I Year</option>
+                    <option value="2">II Year</option>
+                    <option value="3">III Year</option>
+                    <option value="4">IV Year</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Phase (Sem)</label>
+                  <select name="semester" id="semester" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="I-I">I-I</option>
+                    <option value="I-II">I-II</option>
+                    <option value="II-I">II-I</option>
+                    <option value="II-II">II-II</option>
+                    <option value="III-I">III-I</option>
+                    <option value="III-II">III-II</option>
+                    <option value="IV-I">IV-I</option>
+                    <option value="IV-II">IV-II</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Unit (Sec)</label>
+                  <input type="text" name="section" id="section" class="form-control">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Comm Link</label>
+                  <input type="text" name="mobile" id="mobile" class="form-control">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Gender</label>
+                  <select name="gender" id="gender" class="form-select">
+                    <option value="">Select...</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-3 mb-5" style="background: rgba(2, 119, 189, 0.1); border: 1px solid var(--pandora-blue);">
+                 <div class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label text-warning">Exam Type</label>
+                      <select name="exam_type" id="exam_type" class="form-select" required>
+                        <option value="Regular">Regular</option>
+                        <option value="Supplementary">Supplementary</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label text-warning">Month</label>
+                      <select name="exam_month" id="exam_month" class="form-select" required>
+                        <option value="">Select...</option>
+                        <option>January</option>
+                        <option>February</option>
+                        <option>March</option>
+                        <option>April</option>
+                        <option>May</option>
+                        <option>June</option>
+                        <option>July</option>
+                        <option>August</option>
+                        <option>September</option>
+                        <option>October</option>
+                        <option>November</option>
+                        <option>December</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label text-warning">Year</label>
+                      <select name="exam_year" id="exam_year" class="form-select" required>
+                        <option value="">Select...</option>
+                        <option>2025</option>
+                        <option>2026</option>
+                        <option>2027</option>
+                      </select>
+                    </div>
+                 </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                 <label class="form-label mb-0 text-white">TSAHEYLU (SYNC SUBJECTS)</label>
+                <button type="button" id="loadSubjectsBtn" class="btn btn-sm btn-biolum" style="font-size: 0.7rem;">
+                   INITIATE BOND
+                </button>
+              </div>
+
+              <div id="subjectsContainer">
+                <div class="text-center text-muted small py-4" style="font-family: var(--font-tech); letter-spacing: 1px;">
+                  <i class="bi bi-diagram-3 fs-4 d-block mb-2"></i>
+                  AWAITING NEURAL CONNECTION...
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="mb-3">
+                 <label class="form-label">AVATAR (PHOTO)</label>
+              </div>
+
+              <div class="photo-pod mb-4">
+                <div class="transparency-grid mb-3">
+                   <div id="emptyIcon" class="text-muted"><i class="bi bi-person-square fs-1 opacity-25"></i></div>
+                   <img id="photoPreview" class="img-fluid" style="display: none;">
+                </div>
+
+                <input type="file" name="photo" id="photoInput" class="form-control form-control-sm mb-2" accept="image/*" style="font-size: 0.8rem;">
+              </div>
+
+              <div class="p-4 rounded-3 mb-4" style="background: rgba(0,240,255,0.05); border: 1px solid var(--pandora-teal);">
+                <h6 class="fw-bold mb-3" style="color: var(--pandora-teal); font-family: var(--font-tech); letter-spacing: 1px;">DATA PACKET</h6>
+                <ul class="list-unstyled small mb-0" style="color: #b2ebf2; font-family: var(--font-tech);">
+                  <li class="mb-2"><i class="bi bi-check2-circle me-2"></i> Application Form</li>
+                  <li class="mb-2"><i class="bi bi-check2-circle me-2"></i> Hall Ticket (Student)</li>
+                  <li><i class="bi bi-check2-circle me-2"></i> Hall Ticket (Office)</li>
+                </ul>
+              </div>
+
+              <button type="submit" class="btn btn-eywa">
+                GENERATE LINK
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer container">
+    <p>SYSTEM UPLINK ESTABLISHED BY <span class="text-white">MATLI VISHNU VARDHAN NAIDU</span> & <span class="text-white">YEMMALA LEKHA SREE</span></p>
+  </footer>
+
+  <div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="color: var(--pandora-teal); font-family: var(--font-tech);">REFINE IMAGE</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center bg-black p-0 d-flex justify-content-center align-items-center" style="min-height: 400px; overflow:hidden;">
+            <img id="imageToCrop" src="" alt="Picture to crop" style="max-width: 100%; max-height: 60vh; display: block;">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-outline-secondary text-white" data-bs-dismiss="modal">DISCONNECT</button>
+          <button type="button" class="btn btn-biolum btn-sm" id="cropImageBtn">CONFIRM</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+  <script>
+    // --- 1. STUDENT FETCH LOGIC ---
+    const fetchForm = document.getElementById("fetchForm");
+    const rollFetch = document.getElementById("roll_number_fetch");
+    const dobFetch = document.getElementById("dob_fetch");
+
+    fetchForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = fetchForm.querySelector("button[type='submit']");
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>LINKING...';
+      btn.disabled = true;
+
+      const roll = rollFetch.value.trim();
+      const dob = dobFetch.value;
+
+      if (!roll || !dob) {
+        alert("Credentials Required for Uplink.");
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/get-student", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roll_number: roll, dob })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Signal Lost: Student not found.");
+        } else {
+          // Fill fields
+          ['roll_number', 'name', 'father_name', 'dob', 'department', 'year', 'semester', 'section', 'mobile', 'gender', 'regulation'].forEach(id => {
+             if(document.getElementById(id)) document.getElementById(id).value = data[id] || "";
+          });
+
+          if (data.photo_base64) {
+            document.getElementById("photoPreview").src = data.photo_base64;
+            document.getElementById("photoPreview").style.display = 'block';
+            document.getElementById("emptyIcon").style.display = 'none';
+          }
+          
+          document.getElementById("hallForm").scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Network Error: Link Unstable.");
+      } finally {
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+      }
+    });
+
+    // --- 2. CURRICULUM SYNC LOGIC ---
+    const loadSubjectsBtn = document.getElementById("loadSubjectsBtn");
+    const subjectsContainer = document.getElementById("subjectsContainer");
+
+    loadSubjectsBtn.addEventListener("click", async () => {
+      const dept = document.getElementById("department").value;
+      const year = document.getElementById("year").value;
+      const sem = document.getElementById("semester").value;
+      const reg = document.getElementById("regulation").value;
+      const examType = document.getElementById("exam_type").value;
+      const roll = document.getElementById("roll_number").value;
+
+      if (!dept || !year || !sem || !reg) {
+        alert("Parameters Missing. Cannot establish bond.");
+        return;
+      }
+
+      subjectsContainer.innerHTML = `<div class="text-center py-4 text-info"><span class="spinner-border spinner-border-sm me-2"></span>ESTABLISHING BOND...</div>`;
+
+      try {
+        const url = `/api/subjects?department=${encodeURIComponent(dept)}&year=${encodeURIComponent(year)}&semester=${encodeURIComponent(sem)}&regulation=${encodeURIComponent(reg)}&exam_type=${encodeURIComponent(examType)}&roll_number=${encodeURIComponent(roll)}`;
+        const res = await fetch(url);
+        const subs = await res.json();
+
+        if (!Array.isArray(subs) || subs.length === 0) {
+          subjectsContainer.innerHTML = `<div class="text-center text-muted small">No data found in the network.</div>`;
+          return;
+        }
+
+        let html = '<div class="row g-2">';
+        subs.forEach((s) => {
+          const value = `${s.subject_code}||${s.subject_name}`;
+          html += `
+            <div class="col-md-6">
+              <div class="subject-pill d-flex align-items-center">
+                <input class="form-check-input mt-0 me-3" type="checkbox" name="subjects" value="${value}" id="sub_${s.id}" checked>
+                <label class="form-check-label lh-sm w-100" for="sub_${s.id}" style="cursor: pointer; font-family: var(--font-tech);">
+                  <span class="d-block fw-bold text-white mb-1">${s.subject_code}</span>
+                  <span class="small" style="color: #b2ebf2;">${s.subject_name}</span>
+                </label>
+              </div>
+            </div>`;
+        });
+        html += '</div>';
+        subjectsContainer.innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        subjectsContainer.innerHTML = `<div class="text-danger text-center small">Bond Failed. Retry.</div>`;
+      }
+    });
+
+    // --- 3. PHOTO CROP LOGIC ---
+    const photoInput = document.getElementById('photoInput');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const cropModalEl = document.getElementById('cropModal');
+    const cropModal = new bootstrap.Modal(cropModalEl);
+    let cropper;
+
+    photoInput.addEventListener('change', function (e) {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          photoInput.value = ''; 
+          imageToCrop.src = reader.result;
+          cropModal.show();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    cropModalEl.addEventListener('shown.bs.modal', function () {
+      cropper = new Cropper(imageToCrop, {
+        aspectRatio: 3 / 4,
+        viewMode: 1,
+        autoCropArea: 1,
+        background: false,
+      });
+    });
+
+    cropModalEl.addEventListener('hidden.bs.modal', function () {
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    });
+
+    document.getElementById('cropImageBtn').addEventListener('click', function () {
+      if (!cropper) return;
+      
+      const canvas = cropper.getCroppedCanvas({ width: 300, height: 400 });
+      
+      canvas.toBlob(function (blob) {
+        const newFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(newFile);
+        photoInput.files = dataTransfer.files;
+
+        const previewUrl = URL.createObjectURL(blob);
+        document.getElementById("photoPreview").src = previewUrl;
+        document.getElementById("photoPreview").style.display = 'block';
+        document.getElementById("emptyIcon").style.display = 'none';
+        
+        cropModal.hide();
+      }, 'image/jpeg');
+    });
+
+  </script>
+</body>
+</html>

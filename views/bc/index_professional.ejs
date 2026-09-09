@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MITS | Executive Portal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Palette: Platinum & Slate */
+      --bg-base: #f1f5f9;       /* Light Grey-Blue (Platinum) */
+      --bg-shade: #e2e8f0;      /* Slightly darker shade */
+      --card-bg: #ffffff;
+      
+      /* The "Dark Shaded" Elements */
+      --slate-dark: #1e293b;    /* Midnight Slate */
+      --slate-mid: #475569;     /* Medium Slate */
+      --slate-light: #94a3b8;   /* Light Slate */
+      
+      /* Premium Accent */
+      --gold-accent: #d4af37;   /* Champagne Gold */
+      --gold-dim: #f3e5ab;
+      
+      /* Typography */
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'Manrope', sans-serif;
+      
+      /* Dimensions */
+      --radius-smooth: 16px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      /* Subtle gradient background for "not fully light" feel */
+      background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%); 
+      color: var(--slate-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Subtle Texture Overlay (Premium Paper Feel) */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .main-container {
+      max-width: 1050px;
+      margin: 0 auto;
+      flex: 1;
+      padding: 3rem 1.5rem;
+    }
+
+    /* --- PREMIUM CARDS --- */
+    .executive-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-smooth);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+        0 10px 15px -3px rgba(0, 0, 0, 0.05); /* Soft, diffused shadows */
+      margin-bottom: 2.5rem;
+      border: 1px solid #fff;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .executive-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 10px 25px -5px rgba(0, 0, 0, 0.08), 
+        0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Elegant Top Border */
+    .executive-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, var(--slate-dark), var(--slate-mid));
+    }
+
+    .card-header-exec {
+      padding: 2rem 2.5rem 1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .exec-title {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--slate-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .exec-step {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      color: #f1f5f9; /* Very subtle number */
+      font-weight: 700;
+      line-height: 1;
+      position: relative;
+      top: 5px;
+    }
+
+    .card-body-exec { padding: 2.5rem; }
+
+    /* --- INPUTS: Clean & Sharp --- */
+    .form-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--slate-mid);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+      background-color: #f8fafc; /* Very light grey */
+      border: 1px solid #e2e8f0;
+      color: var(--slate-dark);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background-color: #fff;
+      border-color: var(--slate-dark);
+      box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.05);
+      outline: none;
+    }
+
+    .form-control::placeholder { color: #cbd5e1; }
+
+    input[readonly] {
+      background-color: #f1f5f9 !important;
+      border-color: transparent !important;
+      color: var(--slate-mid) !important;
+      font-weight: 600;
+    }
+
+    /* --- BUTTONS: Sophisticated --- */
+    .btn-exec-primary {
+      background: var(--slate-dark);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(30, 41, 59, 0.2);
+    }
+    
+    .btn-exec-primary:hover {
+      background: #0f172a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(30, 41, 59, 0.25);
+    }
+
+    .btn-exec-outline {
+      background: transparent;
+      border: 1px solid var(--slate-mid);
+      color: var(--slate-mid);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .btn-exec-outline:hover {
+      background: var(--slate-dark);
+      border-color: var(--slate-dark);
+      color: #fff;
+    }
+
+    .btn-exec-action {
+      width: 100%;
+      background: linear-gradient(135deg, var(--slate-dark) 0%, #334155 100%);
+      color: #fff;
+      padding: 18px;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: none;
+      border-radius: var(--radius-smooth);
+      margin-top: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .btn-exec-action::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-exec-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(30, 41, 59, 0.2);
+    }
+    .btn-exec-action:hover::after { opacity: 1; }
+
+    /* --- HEADER --- */
+    .app-header {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e2e8f0;
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      margin-bottom: 2rem;
+    }
+
+    .header-logo {
+      height: 65px;
+      margin-right: 1.5rem;
+    }
+
+    .univ-title {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--slate-dark);
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+
+    .univ-subtitle {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gold-accent); /* Premium Gold Touch */
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    /* --- EXTRAS --- */
+    .photo-area-clean {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius-smooth);
+      padding: 2rem;
+      text-align: center;
+      transition: 0.2s;
+    }
+    .photo-area-clean:hover {
+      border-color: var(--slate-mid);
+      background: #fff;
+    }
+
+    .transparency-check {
+      background-color: #fff;
+      background-image: 
+        linear-gradient(45deg, #f1f5f9 25%, transparent 25%), 
+        linear-gradient(-45deg, #f1f5f9 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #f1f5f9 75%), 
+        linear-gradient(-45deg, transparent 75%, #f1f5f9 75%);
+      background-size: 20px 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      width: 150px;
+      height: 200px;
+      margin: 0 auto 1.5rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #photoPreview {
+        max-width: 100%;
+        max-height: 100%;
+        display: none;
+    }
+
+    .section-divider {
+      display: flex;
+      align-items: center;
+      margin: 2rem 0 1.5rem 0;
+    }
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+      margin-left: 1rem;
+    }
+    .section-text {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--slate-mid);
+      font-size: 1.1rem;
+    }
+
+    /* Curriculum */
+    #subjectsContainer {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+    }
+
+    .subject-row {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .subject-row:hover {
+      border-color: var(--slate-mid);
+      transform: translateX(2px);
+    }
+
+    .form-check-input:checked {
+      background-color: var(--slate-dark);
+      border-color: var(--slate-dark);
+    }
+
+    /* Footer */
+    .app-footer {
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+      padding: 2rem 0;
+      margin-top: auto;
+      text-align: center;
+      color: var(--slate-mid);
+      font-size: 0.85rem;
+    }
+
+    /* Modal */
+    .modal-content {
+      border-radius: var(--radius-smooth);
+      border: none;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .modal-header { border-bottom: 1px solid #f1f5f9; }
+    .modal-footer { border-top: 1px solid #f1f5f9; }
+
+  </style>
+</head>
+
+<body>
+
+  <header class="app-header">
+    <div class="container d-flex align-items-center justify-content-center">
+      <img src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png" alt="Logo" class="header-logo">
+      <div>
+        <div class="univ-subtitle">Examination Control Division</div>
+        <h1 class="univ-title">Madanapalle Institute of<br>Technology &amp; Science</h1>
+      </div>
+    </div>
+  </header>
+
+  <div class="container main-container">
+
+    <div class="executive-card">
+      <div class="card-header-exec">
+        <span class="exec-title">Candidate Identity</span>
+        <span class="exec-step">01</span>
+      </div>
+      <div class="card-body-exec">
+        <form id="fetchForm" class="row g-4 align-items-end">
+          <div class="col-md-5">
+            <label class="form-label">Roll Number</label>
+            <input type="text" class="form-control" id="roll_number_fetch" placeholder="e.g. 24695A4006" required style="font-family: 'Manrope', monospace; letter-spacing: 1px; text-transform: uppercase;">
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" class="form-control" id="dob_fetch" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-exec-primary w-100">
+              Locate Record
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="executive-card">
+      <div class="card-header-exec">
+        <span class="exec-title">Examination Configuration</span>
+        <span class="exec-step">02</span>
+      </div>
+      <div class="card-body-exec">
+
+        <form id="hallForm" action="/generate-halltkt" method="POST" enctype="multipart/form-data" target="_blank">
+          <div class="row g-5">
+
+            <div class="col-lg-8">
+              
+              <div class="section-divider">
+                <span class="section-text">Profile Details</span>
+              </div>
+              
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label">Roll Number</label>
+                  <input type="text" name="roll_number" id="roll_number" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" name="name" id="name" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Guardian</label>
+                  <input type="text" name="father_name" id="father_name" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Date of Birth</label>
+                  <input type="date" name="dob" id="dob" class="form-control" readonly>
+                </div>
+              </div>
+
+              <div class="section-divider">
+                <span class="section-text">Academic Parameters</span>
+              </div>
+
+              <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                  <label class="form-label">Mode</label>
+                  <select name="mode" id="mode" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="Autonomous">Autonomous</option>
+                    <option value="University">University</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Department</label>
+                  <select name="department" id="department" class="form-select">
+                    <option value="">Select...</option>
+                    <option value="Networks">Networks</option>
+                    <option value="AI & ML">AI & ML</option>
+                    <option value="AI">AI</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Cyber Security">Cyber Security</option>
+                    <option value="Civil">Civil</option>
+                    <option value="EEE">EEE</option>
+                    <option value="ECE">ECE</option>
+                    <option value="Mechanical">Mechanical</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Regulation</label>
+                  <select name="regulation" id="regulation" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="R23">R23</option>
+                    <option value="R20">R20</option>
+                    <option value="R19">R19</option>
+                    <option value="R18">R18</option>
+                  </select>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Year</label>
+                  <select name="year" id="year" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="1">I Year</option>
+                    <option value="2">II Year</option>
+                    <option value="3">III Year</option>
+                    <option value="4">IV Year</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Semester</label>
+                  <select name="semester" id="semester" class="form-select" required>
+                    <option value="">Select...</option>
+                    <option value="I-I">I-I</option>
+                    <option value="I-II">I-II</option>
+                    <option value="II-I">II-I</option>
+                    <option value="II-II">II-II</option>
+                    <option value="III-I">III-I</option>
+                    <option value="III-II">III-II</option>
+                    <option value="IV-I">IV-I</option>
+                    <option value="IV-II">IV-II</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Section</label>
+                  <input type="text" name="section" id="section" class="form-control" placeholder="A/B/C">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Mobile</label>
+                  <input type="text" name="mobile" id="mobile" class="form-control">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Gender</label>
+                  <select name="gender" id="gender" class="form-select">
+                    <option value="">Select...</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-3 mb-5" style="background: #e2e8f0; border: 1px solid #cbd5e1;">
+                 <div class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label text-dark">Exam Type</label>
+                      <select name="exam_type" id="exam_type" class="form-select" required style="background-color: #fff;">
+                        <option value="Regular">Regular</option>
+                        <option value="Supplementary">Supplementary</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label text-dark">Month</label>
+                      <select name="exam_month" id="exam_month" class="form-select" required style="background-color: #fff;">
+                        <option value="">Select...</option>
+                        <option>January</option>
+                        <option>February</option>
+                        <option>March</option>
+                        <option>April</option>
+                        <option>May</option>
+                        <option>June</option>
+                        <option>July</option>
+                        <option>August</option>
+                        <option>September</option>
+                        <option>October</option>
+                        <option>November</option>
+                        <option>December</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label text-dark">Year</label>
+                      <select name="exam_year" id="exam_year" class="form-select" required style="background-color: #fff;">
+                        <option value="">Select...</option>
+                        <option>2025</option>
+                        <option>2026</option>
+                        <option>2027</option>
+                      </select>
+                    </div>
+                 </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                 <div class="section-divider m-0 flex-grow-0 border-0">
+                    <span class="section-text m-0">Registered Curriculum</span>
+                 </div>
+                <button type="button" id="loadSubjectsBtn" class="btn btn-exec-outline">
+                  <i class="bi bi-arrow-repeat me-1"></i> Sync Subjects
+                </button>
+              </div>
+
+              <div id="subjectsContainer">
+                <div class="text-center text-muted small py-4">
+                  Awaiting academic configuration...
+                </div>
+              </div>
+
+            </div>
+
+            <div class="col-lg-4">
+              <div class="mb-3">
+                 <label class="form-label">Passport Photograph</label>
+              </div>
+
+              <div class="photo-area-clean mb-4">
+                <div class="transparency-check">
+                   <div id="emptyIcon" class="text-muted"><i class="bi bi-person-bounding-box fs-1 opacity-25"></i></div>
+                   <img id="photoPreview">
+                </div>
+
+                <label class="btn btn-sm btn-exec-outline w-100 position-relative">
+                   Upload Image
+                   <input type="file" name="photo" id="photoInput" accept="image/*" style="position: absolute; top:0; left:0; opacity: 0; width:100%; height:100%; cursor: pointer;">
+                </label>
+                <div class="text-muted mt-2" style="font-size: 0.75rem;">JPG/PNG, White Background.</div>
+              </div>
+
+              <div class="p-4 rounded-3 mb-4" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <h6 class="fw-bold mb-3" style="color: var(--slate-dark); font-family: var(--font-serif);">Document Bundle</h6>
+                <ul class="list-unstyled small mb-0" style="color: var(--slate-mid);">
+                  <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: var(--gold-accent);"></i> Application Form</li>
+                  <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color: var(--gold-accent);"></i> Hall Ticket (Student)</li>
+                  <li><i class="bi bi-check-circle-fill me-2" style="color: var(--gold-accent);"></i> Hall Ticket (Office)</li>
+                </ul>
+              </div>
+
+              <button type="submit" class="btn btn-exec-action">
+                Generate Hall Ticket
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer container">
+    <p>System Architecture: <strong>Matli Vishnu Vardhan Naidu</strong> & <strong>Yemmala Lekha Sree</strong></p>
+    <p class="text-muted small">© 2025 Madanapalle Institute of Technology & Science. All Rights Reserved.</p>
+  </footer>
+
+  <div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-family: var(--font-serif); font-weight: 700;">Refine Photograph</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center bg-dark p-0 d-flex justify-content-center align-items-center" style="min-height: 400px; overflow:hidden;">
+            <img id="imageToCrop" src="" alt="Picture to crop" style="max-width: 100%; max-height: 60vh; display: block;">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-exec-primary btn-sm" id="cropImageBtn">Apply Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+  <script>
+    // --- 1. STUDENT FETCH LOGIC ---
+    const fetchForm = document.getElementById("fetchForm");
+    const rollFetch = document.getElementById("roll_number_fetch");
+    const dobFetch = document.getElementById("dob_fetch");
+
+    fetchForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = fetchForm.querySelector("button[type='submit']");
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Searching...';
+      btn.disabled = true;
+
+      const roll = rollFetch.value.trim();
+      const dob = dobFetch.value;
+
+      if (!roll || !dob) {
+        alert("Please enter both credentials.");
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/get-student", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roll_number: roll, dob })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Student record not found.");
+        } else {
+          ['roll_number', 'name', 'father_name', 'dob', 'department', 'year', 'semester', 'section', 'mobile', 'gender', 'regulation'].forEach(id => {
+             if(document.getElementById(id)) document.getElementById(id).value = data[id] || "";
+          });
+
+          if (data.photo_base64) {
+            document.getElementById("photoPreview").src = data.photo_base64;
+            document.getElementById("photoPreview").style.display = 'block';
+            document.getElementById("emptyIcon").style.display = 'none';
+          }
+          
+          document.getElementById("hallForm").scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server connection failed.");
+      } finally {
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+      }
+    });
+
+    // --- 2. CURRICULUM SYNC LOGIC ---
+    const loadSubjectsBtn = document.getElementById("loadSubjectsBtn");
+    const subjectsContainer = document.getElementById("subjectsContainer");
+
+    loadSubjectsBtn.addEventListener("click", async () => {
+      const dept = document.getElementById("department").value;
+      const year = document.getElementById("year").value;
+      const sem = document.getElementById("semester").value;
+      const reg = document.getElementById("regulation").value;
+      const examType = document.getElementById("exam_type").value;
+      const roll = document.getElementById("roll_number").value;
+
+      if (!dept || !year || !sem || !reg) {
+        alert("Please complete the Academic Parameters section.");
+        return;
+      }
+
+      subjectsContainer.innerHTML = `<div class="text-center py-4 text-primary"><span class="spinner-border spinner-border-sm me-2"></span>Loading curriculum...</div>`;
+
+      try {
+        const url = `/api/subjects?department=${encodeURIComponent(dept)}&year=${encodeURIComponent(year)}&semester=${encodeURIComponent(sem)}&regulation=${encodeURIComponent(reg)}&exam_type=${encodeURIComponent(examType)}&roll_number=${encodeURIComponent(roll)}`;
+        const res = await fetch(url);
+        const subs = await res.json();
+
+        if (!Array.isArray(subs) || subs.length === 0) {
+          subjectsContainer.innerHTML = `<div class="text-center text-muted small">No curriculum data found.</div>`;
+          return;
+        }
+
+        let html = '<div class="row g-2">';
+        subs.forEach((s) => {
+          const value = `${s.subject_code}||${s.subject_name}`;
+          html += `
+            <div class="col-md-6">
+              <div class="subject-row d-flex align-items-center">
+                <input class="form-check-input mt-0 me-3" type="checkbox" name="subjects" value="${value}" id="sub_${s.id}" checked>
+                <label class="form-check-label lh-sm w-100" for="sub_${s.id}" style="cursor: pointer;">
+                  <span class="d-block fw-bold text-dark small mb-1">${s.subject_code}</span>
+                  <span class="text-muted small d-block">${s.subject_name}</span>
+                </label>
+              </div>
+            </div>`;
+        });
+        html += '</div>';
+        subjectsContainer.innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        subjectsContainer.innerHTML = `<div class="text-danger text-center small">Sync failed. Retry.</div>`;
+      }
+    });
+
+    // --- 3. PHOTO CROP LOGIC ---
+    const photoInput = document.getElementById('photoInput');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const cropModalEl = document.getElementById('cropModal');
+    const cropModal = new bootstrap.Modal(cropModalEl);
+    let cropper;
+
+    photoInput.addEventListener('change', function (e) {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          photoInput.value = ''; 
+          imageToCrop.src = reader.result;
+          cropModal.show();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    cropModalEl.addEventListener('shown.bs.modal', function () {
+      cropper = new Cropper(imageToCrop, {
+        aspectRatio: 3 / 4,
+        viewMode: 1,
+        autoCropArea: 1,
+        background: false,
+      });
+    });
+
+    cropModalEl.addEventListener('hidden.bs.modal', function () {
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    });
+
+    document.getElementById('cropImageBtn').addEventListener('click', function () {
+      if (!cropper) return;
+      
+      const canvas = cropper.getCroppedCanvas({ width: 300, height: 400 });
+      
+      canvas.toBlob(function (blob) {
+        const newFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(newFile);
+        photoInput.files = dataTransfer.files;
+
+        const previewUrl = URL.createObjectURL(blob);
+        document.getElementById("photoPreview").src = previewUrl;
+        document.getElementById("photoPreview").style.display = 'block';
+        document.getElementById("emptyIcon").style.display = 'none';
+        
+        cropModal.hide();
+      }, 'image/jpeg');
+    });
+
+  </script>
+</body>
+</html>

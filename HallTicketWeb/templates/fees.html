@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row align-items-center mb-4 g-3">
+  <div class="col-12 col-md-8">
+    <h2 class="text-white m-0">Fee Management</h2>
+    <p class="small text-muted mb-0">Set student quota type and college fee totals / pending.</p>
+  </div>
+</div>
+
+<form class="glass-card row g-3 mb-4 align-items-center" method="GET">
+  <div class="col-6 col-md-3">
+    <select name="dept" class="form-select">
+      <option value="">Dept</option>
+      {% for d in depts %}<option value="{{ d }}" {% if request.args.get('dept')==d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-6 col-md-3">
+    <select name="year" class="form-select">
+      <option value="">Year</option>
+      {% for y in years %}<option value="{{ y }}" {% if request.args.get('year')==y|string %}selected{% endif %}>{{ y }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-md-3">
+    <button class="btn btn-info w-100 fw-bold">Filter</button>
+  </div>
+  <div class="col-12 col-md-3 text-md-end">
+    <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+      <a href="{{ url_for('fees_sample_csv') }}" class="btn btn-outline-info w-100 w-md-auto">
+        <i class="fas fa-download me-2"></i>Sample CSV
+      </a>
+      <button type="button" class="btn btn-outline-light w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#feeImportModal">
+        <i class="fas fa-file-upload me-2"></i>Import CSV
+      </button>
+    </div>
+  </div>
+</form>
+
+<div class="glass-card mb-4">
+  <form method="GET" class="row g-3 align-items-end">
+    <div class="col-12 col-md-6">
+      <label class="form-label small">Roll Number</label>
+      <input type="text" name="roll_number" class="form-control" value="{{ request.args.get('roll_number','') }}" placeholder="e.g., 24695A4006" required>
+    </div>
+    <div class="col-12 col-md-2">
+      <button class="btn btn-neon w-100">Search</button>
+    </div>
+  </form>
+</div>
+
+{% if student %}
+<div class="glass-card">
+  <form method="POST" class="row g-3">
+    <input type="hidden" name="roll_number" value="{{ student[0] }}">
+    <div class="col-12 col-md-6">
+      <label class="form-label small">Student</label>
+      <input type="text" class="form-control" value="{{ student[0] }} - {{ student[1] }}" readonly>
+    </div>
+    <div class="col-12 col-md-3">
+      <label class="form-label small">Dept / Sem</label>
+      <input type="text" class="form-control" value="{{ student[2] }} / {{ student[3] }}" readonly>
+    </div>
+    <div class="col-12 col-md-3">
+      <label class="form-label small">Quota Type</label>
+      <select name="quota_type" class="form-select">
+        <option value="CONVENER" {% if student[4] == 'CONVENER' %}selected{% endif %}>Convener</option>
+        <option value="MANAGEMENT" {% if student[4] == 'MANAGEMENT' %}selected{% endif %}>Management</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-3">
+      <label class="form-label small">College Fee Total (₹)</label>
+      <input type="number" name="college_fee_total" class="form-control" value="{{ student[5] or 0 }}" min="0">
+    </div>
+    <div class="col-12 col-md-3">
+      <label class="form-label small">College Fee Pending (₹)</label>
+      <input type="number" name="college_fee_pending" class="form-control" value="{{ student[6] or 0 }}" min="0">
+    </div>
+    <div class="col-12 col-md-3 d-flex align-items-end">
+      <button class="btn btn-neon w-100">Save Fee Details</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<div class="glass-card p-0 overflow-hidden mt-4">
+  <div class="table-responsive">
+    <table class="table table-glass table-hover mb-0">
+      <thead>
+        <tr>
+          <th class="ps-4">Roll No</th>
+          <th>Name</th>
+          <th>Dept</th>
+          <th>Year / Sem</th>
+          <th>Quota</th>
+          <th>Total (₹)</th>
+          <th>Pending (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in fee_rows %}
+        <tr>
+          <td class="ps-4"><span class="badge bg-secondary bg-opacity-50 border border-secondary">{{ r[0] }}</span></td>
+          <td>{{ r[1] }}</td>
+          <td>{{ r[2] }}</td>
+          <td>{{ r[3] }} / {{ r[4] }}</td>
+          <td>{{ r[5] }}</td>
+          <td>{{ r[6] or 0 }}</td>
+          <td>{{ r[7] or 0 }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center py-4 text-muted">No fee records for selected filters.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="feeImportModal">
+  <div class="modal-dialog">
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('fees_import') }}" class="modal-content glass-card p-0">
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title">Import Fee Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="file" name="import_file" class="form-control" accept=".csv,.xlsx"
+               onchange="validateCsv(this, 'fees', 'feesCsvValidationResult')" required>
+        <div id="feesCsvValidationResult" class="mt-2 small"></div>
+        <div class="mt-2 text-muted small"><i class="fas fa-info-circle me-1"></i>Req Columns: roll_number. Optional: quota_type, college_fee_total, college_fee_pending</div>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button class="btn btn-success w-100">Upload CSV</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-12">
+        <h2 class="text-white m-0">Bulk Clear Backlogs</h2>
+        <p class="text-muted small mt-2">Clear backlogs for multiple students at once. Use with caution.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Clear by Semester -->
+    <div class="col-lg-6">
+        <div class="glass-card">
+            <h5 class="mb-3 text-warning"><i class="fas fa-calendar me-2"></i>Clear by Semester</h5>
+            <p class="small text-muted mb-3">Remove all backlogs for a specific semester (optionally filtered by department).</p>
+            <form method="POST" onsubmit="return confirm('Are you sure? This will delete all backlogs for this semester.');">
+                <input type="hidden" name="action" value="clear_by_semester">
+                
+                <div class="mb-3">
+                    <label class="form-label small">Department (optional)</label>
+                    <select name="department" class="form-select">
+                        <option value="ALL">All Departments</option>
+                        {% for d in depts %}
+                        <option value="{{ d }}">{{ d }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small">Semester</label>
+                    <select name="semester" class="form-select" required>
+                        <option value="">-- Select --</option>
+                        {% for s in sems %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="fas fa-trash me-2"></i>Clear by Semester
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Clear by Roll Range -->
+    <div class="col-lg-6">
+        <div class="glass-card">
+            <h5 class="mb-3 text-warning"><i class="fas fa-users me-2"></i>Clear by Roll Range</h5>
+            <p class="small text-muted mb-3">Remove backlogs for students within a roll number range (e.g., 24695A4001 to 24695A4100).</p>
+            <form method="POST" onsubmit="return confirm('Are you sure? This will delete all backlogs for this roll range.');">
+                <input type="hidden" name="action" value="clear_by_roll_range">
+                
+                <div class="mb-3">
+                    <label class="form-label small">Start Roll Number</label>
+                    <input type="text" name="roll_start" class="form-control" placeholder="e.g., 24695A4001" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small">End Roll Number</label>
+                    <input type="text" name="roll_end" class="form-control" placeholder="e.g., 24695A4100" required>
+                </div>
+
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="fas fa-trash me-2"></i>Clear by Roll Range
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #adb5bd;
+    }
+
+    .form-control, .form-select {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: #ffc107;
+        color: white;
+    }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+</style>
+{% endblock %}

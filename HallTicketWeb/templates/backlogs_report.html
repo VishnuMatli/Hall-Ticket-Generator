@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-6">
+        <h2 class="text-white m-0">Backlogs Report</h2>
+    </div>
+    <div class="col-12 col-md-6 text-md-end">
+        <a href="{{ url_for('bulk_clear_backlogs') }}" class="btn btn-outline-danger">
+            <i class="fas fa-trash me-2"></i>Bulk Clear
+        </a>
+    </div>
+</div>
+
+<form class="glass-card row g-3 mb-4 align-items-center" method="GET">
+    <div class="col-6 col-md-3">
+        <select name="dept" class="form-select">
+            <option value="">All Departments</option>
+            {% for d in depts %}<option value="{{d}}" {% if dept_filter==d %}selected{% endif %}>{{d}}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-6 col-md-3">
+        <select name="sem" class="form-select">
+            <option value="">All Semesters</option>
+            {% for s in sems %}<option value="{{s}}" {% if sem_filter==s %}selected{% endif %}>{{s}}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-12 col-md-6">
+        <button class="btn btn-info w-100 fw-bold">Filter</button>
+    </div>
+</form>
+
+<div class="glass-card mb-4 p-4">
+    <div class="row text-center g-3">
+        <div class="col-md-6">
+            <div class="stat-box">
+                <div class="stat-label">Students with Backlogs</div>
+                <div class="stat-value text-warning">{{ total_students_with_backlogs }}</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="stat-box">
+                <div class="stat-label">Total Backlog Subjects</div>
+                <div class="stat-value text-danger">{{ total_backlogs }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-glass table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">Roll No</th>
+                    <th>Student Name</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th class="text-end pe-4">Backlog Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report_data %}
+                <tr>
+                    <td class="ps-4"><span class="badge bg-secondary bg-opacity-50 border border-secondary">{{row[0]}}</span></td>
+                    <td class="fw-bold">
+                        <a href="{{ url_for('backlogs', roll_number=row[0]) }}" class="text-decoration-none text-white">
+                            {{ row[1] }}
+                        </a>
+                    </td>
+                    <td class="text-info">{{row[2]}}</td>
+                    <td>{{row[3]}}</td>
+                    <td class="text-end pe-4">
+                        <span class="badge bg-danger">{{row[4]}}</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center py-4 text-muted">No students with backlogs found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .stat-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #adb5bd;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .table-glass {
+        color: inherit;
+    }
+
+    .table-glass tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+</style>
+{% endblock %}

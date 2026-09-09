@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-8">
+        <h2 class="text-white m-0">Backlogs - {{ student[0] }} ({{ student[1] }})</h2>
+        <p class="text-muted mb-0">Dept: {{ student[2] }} | Reg: {{ student[3] }} | Year: {{ student[5] }}</p>
+    </div>
+    <div class="col-12 col-md-4 text-md-end">
+        <form method="GET" class="d-flex mb-2 mb-md-0 justify-content-md-end">
+            <select name="sem" class="form-select form-select-sm me-2" style="max-width: 180px;">
+                {% for s in sems %}
+                <option value="{{ s }}" {% if s == current_sem %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-sm btn-info">Load</button>
+        </form>
+        <a href="{{ url_for('students') }}" class="btn btn-outline-light w-100 w-md-auto mt-2 mt-md-2">
+            <i class="fas fa-arrow-left me-2"></i>Back to Students
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="glass-card p-3">
+            <h5 class="text-info mb-3"><i class="fas fa-list-alt me-2"></i>Current Backlog Subjects - {{ current_sem }}</h5>
+            <div class="table-responsive">
+                <table class="table table-glass table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Semester</th>
+                            <th>Dept</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in backlogs %}
+                        <tr>
+                            <td><span class="badge bg-secondary bg-opacity-50 border border-secondary">{{ b[1] }}</span></td>
+                            <td class="small">{{ b[2] }}</td>
+                            <td>{{ b[3] }}</td>
+                            <td class="text-info">{{ b[4] }}</td>
+                            <td class="text-end">
+                                <form method="POST" class="d-inline" onsubmit="return confirm('Remove this backlog subject?');">
+                                    <input type="hidden" name="remove_id" value="{{ b[0] }}">
+                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-times"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-3 text-muted small">No backlog subjects defined for this student.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="glass-card p-3">
+            <h5 class="text-success mb-3"><i class="fas fa-plus-circle me-2"></i>Add Backlog Subject - {{ current_sem }}</h5>
+            <form method="POST" class="row g-3">
+                <div class="col-12">
+                    <label class="small text-muted">Select Subject ({{ student[2] }} / {{ student[3] }} / {{ current_sem }})</label>
+                    <select name="add_subject_id" class="form-select" required>
+                        <option value="">-- Choose Subject --</option>
+                        {% for s in available_subjects %}
+                        <option value="{{ s[0] }}">{{ s[3] }} - {{ s[1] }} | {{ s[2] }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not available_subjects %}
+                        <div class="small text-warning mt-2">All subjects for this curriculum are already marked as backlog or none are defined.</div>
+                    {% endif %}
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-neon w-100" {% if not available_subjects %}disabled{% endif %}>Save Backlog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

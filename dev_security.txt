@@ -1,0 +1,66 @@
+  <script>
+/* =======================================================
+   MAX SECURITY MODE (MOBILE-SAFE VERSION)
+   ======================================================= */
+
+(function(){
+
+    function isMobile() {
+        return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+    }
+
+    function wipePage() {
+        document.documentElement.innerHTML = "";
+        document.write("<h1 style='color:red;text-align:center;margin-top:80px;'>Unauthorized Access</h1>");
+        document.write("<p style='text-align:center;color:#777;'>Developer Tools Detected. Page Disabled.</p>");
+    }
+
+    /* ----- DISABLE RIGHT CLICK ----- */
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    /* ----- DISABLE SHORTCUTS (Desktop only) ----- */
+    document.addEventListener("keydown", function(e){
+        if (isMobile()) return; // allow mobile buttons
+
+        if (e.key === "F12") e.preventDefault();
+        if (e.ctrlKey && e.shiftKey && ["I","C","J"].includes(e.key)) e.preventDefault();
+        if (e.ctrlKey && e.key === "U") e.preventDefault();
+    });
+
+    /* ----- DEVTOOLS DETECTION (DESKTOP ONLY) ----- */
+    if (!isMobile()) {
+
+        // SIZE CHECK
+        setInterval(() => {
+            const w = window.outerWidth - window.innerWidth;
+            const h = window.outerHeight - window.innerHeight;
+
+            if (w > 200 || h > 200) {
+                wipePage();
+            }
+        }, 800);
+
+        // DEBUGGER TIMING CHECK
+        function debugTrap() {
+            const t0 = performance.now();
+            debugger;
+            const t1 = performance.now();
+
+            if (t1 - t0 > 150) {
+                wipePage();
+            }
+        }
+        setInterval(debugTrap, 1500);
+
+        // DOM TAMPER CHECK
+        const origLen = document.documentElement.innerHTML.length;
+        setInterval(() => {
+            const nowLen = document.documentElement.innerHTML.length;
+            if (Math.abs(nowLen - origLen) > 2500) {
+                wipePage();
+            }
+        }, 2000);
+    }
+
+})();
+</script>

@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container d-flex justify-content-center mt-2 mt-md-4 px-0">
+    <div class="glass-card w-100" style="max-width: 700px; padding: 0;">
+        
+        <ul class="nav nav-tabs nav-fill border-bottom-0" id="promoteTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active text-success fw-bold py-3 rounded-top" id="promote-tab" data-bs-toggle="tab" data-bs-target="#promotePanel" type="button" style="background: rgba(25, 135, 84, 0.1);">
+                    <i class="fas fa-arrow-up me-2"></i><span class="d-none d-sm-inline">PROMOTE BATCH</span><span class="d-sm-none">PROMOTE</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-danger fw-bold py-3 rounded-top" id="demote-tab" data-bs-toggle="tab" data-bs-target="#demotePanel" type="button" style="background: rgba(220, 53, 69, 0.1);">
+                    <i class="fas fa-arrow-down me-2"></i><span class="d-none d-sm-inline">DEMOTE BATCH</span><span class="d-sm-none">DEMOTE</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content p-3 p-md-4" id="promoteTabsContent">
+            
+            <div class="tab-pane fade show active" id="promotePanel" role="tabpanel">
+                <div class="text-center mb-4">
+                    <h4 class="text-white">Semester Advancement</h4>
+                    <p class="text-muted small">Move students to the next academic semester (e.g., I-I &rarr; I-II)</p>
+                </div>
+                
+                <form method="POST">
+                    <input type="hidden" name="action" value="promote">
+                    
+                    <div class="mb-4">
+                        <label class="small text-muted text-uppercase mb-1">Target Department</label>
+                        <select name="dept" class="form-select form-select-lg">
+                            <option value="ALL">ALL DEPARTMENTS</option>
+                            {% for d in depts %}<option value="{{d}}">{{d}}</option>{% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="small text-muted text-uppercase mb-1">Current Semester (To move FROM)</label>
+                        <select name="current_sem" class="form-select form-select-lg" required>
+                            <option value="" disabled selected>Select Current Semester</option>
+                            {% for s in sems %}<option value="{{s}}">{{s}}</option>{% endfor %}
+                        </select>
+                    </div>
+
+                    <button class="btn btn-success w-100 py-3 fw-bold shadow-lg">
+                        <i class="fas fa-rocket me-2"></i>PROMOTE STUDENTS
+                    </button>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="demotePanel" role="tabpanel">
+                <div class="text-center mb-4">
+                    <h4 class="text-danger">Academic Rollback</h4>
+                    <p class="text-muted small">Revert students to the previous academic semester</p>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="demote">
+                    
+                    <div class="mb-4">
+                        <label class="small text-muted text-uppercase mb-1">Target Department</label>
+                        <select name="dept" class="form-select form-select-lg" style="border-color: rgba(220, 53, 69, 0.3);">
+                            <option value="ALL">ALL DEPARTMENTS</option>
+                            {% for d in depts %}<option value="{{d}}">{{d}}</option>{% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="small text-muted text-uppercase mb-1">Current Semester</label>
+                        <select name="current_sem" class="form-select form-select-lg" required style="border-color: rgba(220, 53, 69, 0.3);">
+                            <option value="" disabled selected>Select Current Semester</option>
+                            {% for s in sems %}<option value="{{s}}">{{s}}</option>{% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="alert alert-danger bg-opacity-10 border-danger text-danger small">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Warning: Decreases academic year.
+                    </div>
+
+                    <button class="btn btn-danger w-100 py-3 fw-bold shadow-lg">
+                        <i class="fas fa-undo me-2"></i>DEMOTE STUDENTS
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4 text-center">Department Control</h2>
+        
+        <div class="glass-card mb-4">
+            <form method="POST" class="row g-3 align-items-end">
+                <div class="col-md-9">
+                    <label class="form-label text-muted small text-uppercase">New Department Name</label>
+                    <input type="text" name="add_name" class="form-control form-control-lg" placeholder="e.g. Artificial Intelligence" required>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-neon w-100 h-100">Create</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="glass-card p-0 overflow-hidden">
+            <table class="table table-glass table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Department Name</th>
+                        <th class="text-end pe-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in departments %}
+                    <tr>
+                        <td class="ps-4 text-muted">#{{d[0]}}</td>
+                        <td class="fw-bold">{{d[1]}}</td>
+                        <td class="text-end pe-4">
+                            <form method="POST" onsubmit="return confirm('Delete?');">
+                                <input type="hidden" name="delete_id" value="{{d[0]}}">
+                                <button class="btn btn-sm btn-outline-danger px-3 rounded-pill">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

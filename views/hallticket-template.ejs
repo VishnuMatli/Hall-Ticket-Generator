@@ -1,0 +1,514 @@
+<% /* Full hallticket-template.ejs */ %>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hall Ticket</title>
+  <style>
+    @page { size:A4; margin:0; }
+    body { margin:0; font-family:"Times New Roman",serif; }
+
+    .page {
+      width:210mm;
+      min-height:297mm;
+      padding:15mm;
+      box-sizing:border-box;
+      border:1px solid #000;
+      page-break-after:always;
+      position:relative;
+    }
+
+    /* Watermark */
+    .watermark {
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      opacity:0.06;
+      width:65%;
+      pointer-events:none;
+    }
+
+    .header-box {
+      border:1px solid #000;
+      padding:18px 10px;
+      font-size:12px;
+      position:relative;
+      margin-bottom:12px;
+    }
+
+    .univ-title {
+      font-size:19px;
+      font-weight:bold;
+    }
+
+    .inst-name {
+      font-size:17px;
+      font-weight:bold;
+    }
+
+    .title-line {
+      font-weight:bold;
+      font-size:14px;
+      margin-top:6px;
+      text-transform:uppercase;
+    }
+
+    .details-table {
+      width:100%;
+      margin-top:8px;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+
+    .details-table td,
+    .details-table th {
+      border:1px solid #000;
+      padding:4px;
+    }
+
+    .details-table td.label {
+      font-weight:bold;
+      width:32%;
+      background:#f3f3f3;
+    }
+
+    .info-row {
+      margin-top:8px;
+      display:flex;
+      gap:12mm;
+      align-items:flex-start;
+    }
+
+    .info-left { flex:1; }
+
+    .photo-box {
+      width:35mm;
+      height:45mm;
+      border:1px solid #000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:10px;
+      text-align:center;
+    }
+
+    .photo-box img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .subjects-container {
+      display:flex;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .subjects-table {
+      width:50%;
+      border-collapse:collapse;
+      font-size:11px;
+    }
+
+    .subjects-table th,
+    .subjects-table td {
+      border:1px solid #000;
+      padding:4px;
+      text-align:center;
+    }
+
+    .sign-row {
+      margin-top:30px;
+      display:flex;
+      justify-content:space-between;
+      font-size:12px;
+    }
+
+    .sign-box {
+      width:45%;
+      text-align:center;
+    }
+
+    .sign-line {
+      margin-top:24px;
+      border-top:1px solid #000;
+      width:80%;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    .instructions {
+      margin-top:14px;
+      font-size:11px;
+      border:1px solid #000;
+      padding:6px 8px;
+    }
+
+    .instructions-title {
+      font-weight:bold;
+      margin-bottom:4px;
+    }
+  </style>
+</head>
+<body>
+
+<%
+  // ===== Backend helper logic =====
+  let shortDept = department || "";
+  if (department === "Networks") shortDept = "CSE (NW)";
+  if (department === "AI & ML") shortDept = "CSE (AIML)";
+  if (department === "AI") shortDept = "CSE (AI)";
+  if (department === "Data Science") shortDept = "CSE (DS)";
+  if (department === "Cyber Security") shortDept = "CSE (CS)";
+
+  if (!regulation) regulation = "R23";
+
+  const regDigits = regulation.replace(/[^0-9]/g, "");
+  const admittedBatch = "20" + regDigits;
+
+  let romanYear = year;
+  if (year == "1") romanYear = "I";
+  if (year == "2") romanYear = "II";
+  if (year == "3") romanYear = "III";
+  if (year == "4") romanYear = "IV";
+
+  const semText = semester || "";
+
+  const total = subjects.length;
+  const half = Math.ceil(total / 2);
+  const left = subjects.slice(0, half);
+  const right = subjects.slice(half);
+%>
+
+<!-- ===================== PAGE 1: APPLICATION FORM ===================== -->
+<div class="page">
+  <!-- Watermark -->
+  <img class="watermark"
+       src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png">
+
+  <!-- Header -->
+  <div class="header-box">
+    <!-- Left logo -->
+    <img src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png"
+         style="position:absolute;left:12px;top:12px;width:55px;height:55px;object-fit:contain;">
+
+    <!-- Right small box: Regulation + Dept -->
+    <div style="
+         position:absolute;
+         right:12px;
+         top:12px;
+         border:1px solid #000;
+         padding:4px 10px;
+         background:white;
+         text-align:center;">
+      <div><%= regulation %></div>
+      <div><%= shortDept %></div>
+    </div>
+
+    <!-- Conditional institute/university header -->
+    <div style="text-align:center;line-height:1.35;">
+      <% if (mode === "University") { %>
+        <div class="univ-title">MITS – DEEMED TO BE UNIVERSITY</div>
+        <div>(Declared as Deemed to be University under UGC Act)</div>
+        <div>MADANAPALLE – 517325, ANDHRA PRADESH</div>
+      <% } else { %>
+        <div class="inst-name">MADANAPALLE INSTITUTE OF TECHNOLOGY &amp; SCIENCE</div>
+        <div>(UGC – AUTONOMOUS INSTITUTION)</div>
+        <div>MADANAPALLE – 517325 (A.P)</div>
+        <div>(Affiliated to JNTUA, Ananthapuramu &amp; Approved by AICTE, New Delhi)</div>
+      <% } %>
+
+      <div class="title-line">
+        Examination Registration - B.Tech – <%= romanYear %> Year <%= semText %> Semester – <%= regulation %>
+      </div>
+      <div>(For <%= admittedBatch %> Admitted batch onwards)</div>
+      <div>(All the below details are mandatory and should be filled carefully)</div>
+    </div>
+  </div>
+
+  <!-- Application form details (no photo) -->
+  <table class="details-table">
+    <tr><td class="label">Hall Ticket No.</td><td><%= roll_number %></td></tr>
+    <tr><td class="label">Name</td><td><%= name %></td></tr>
+    <tr><td class="label">Father's Name</td><td><%= father_name %></td></tr>
+    <tr><td class="label">Department</td><td><%= department %></td></tr>
+    <tr><td class="label">Year/Semester/Section</td><td><%= romanYear %> / <%= semText %> / <%= section %></td></tr>
+    <tr><td class="label">Month &amp; Year of Examination</td><td><%= exam_month %> / <%= exam_year %></td></tr>
+    <tr><td class="label">Date of Birth</td><td><%= dob %></td></tr>
+    <tr><td class="label">Gender</td><td><%= gender %></td></tr>
+    <tr><td class="label">Contact Number</td><td><%= mobile %></td></tr>
+    <tr><td class="label">Exam Type</td><td><%= exam_type %></td></tr>
+  </table>
+
+  <!-- Subjects list (2 columns) -->
+  <div class="subjects-container">
+    <table class="subjects-table">
+      <tr><th>S.No</th><th>Code</th><th>Subject</th></tr>
+      <% left.forEach((s, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= s.code %></td>
+          <td><%= s.name %></td>
+        </tr>
+      <% }) %>
+    </table>
+
+    <table class="subjects-table">
+      <tr><th>S.No</th><th>Code</th><th>Subject</th></tr>
+      <% right.forEach((s, j) => { %>
+        <tr>
+          <td><%= j + half + 1 %></td>
+          <td><%= s.code %></td>
+          <td><%= s.name %></td>
+        </tr>
+      <% }) %>
+    </table>
+  </div>
+
+  <div class="sign-row">
+    <div class="sign-box">
+      Certified that the above information is correct and filled by me.
+      <div class="sign-line"></div>
+      Signature of Candidate
+    </div>
+    <div class="sign-box">
+      <div class="sign-line"></div>
+      Head of Department
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE 2: ORIGINAL HALL TICKET ===================== -->
+<div class="page">
+  <img class="watermark"
+       src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png">
+
+  <%
+    let pageType = "Original";
+  %>
+
+  <div class="header-box">
+    <!-- Left logo -->
+    <img src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png"
+         style="position:absolute;left:12px;top:12px;width:55px;height:55px;object-fit:contain;">
+
+    <!-- Right reg/branch box -->
+    <div style="
+         position:absolute;
+         right:12px;
+         top:12px;
+         border:1px solid #000;
+         padding:4px 10px;
+         background:white;
+         text-align:center;">
+      <div><%= regulation %></div>
+      <div><%= shortDept %></div>
+    </div>
+
+    <!-- Conditional header text -->
+    <div style="text-align:center;line-height:1.35;">
+      <% if (mode === "University") { %>
+        <div class="univ-title">MITS – DEEMED TO BE UNIVERSITY</div>
+        <div>(Declared as Deemed to be University under UGC Act)</div>
+        <div>MADANAPALLE – 517325, ANDHRA PRADESH</div>
+      <% } else { %>
+        <div class="inst-name">MADANAPALLE INSTITUTE OF TECHNOLOGY &amp; SCIENCE</div>
+        <div>(UGC – AUTONOMOUS INSTITUTION)</div>
+        <div>MADANAPALLE – 517325 (A.P)</div>
+        <div>(Affiliated to JNTUA, Ananthapuramu &amp; Approved by AICTE, New Delhi)</div>
+      <% } %>
+
+      <div class="title-line">Hall Ticket – <%= pageType %></div>
+    </div>
+  </div>
+
+  <!-- Candidate + photo row -->
+  <div class="info-row">
+    <div class="info-left">
+      <table class="details-table">
+        <tr><td class="label">Hall Ticket No.</td><td><%= roll_number %></td></tr>
+        <tr><td class="label">Name</td><td><%= name %></td></tr>
+        <tr><td class="label">Father's Name</td><td><%= father_name %></td></tr>
+        <tr><td class="label">Month &amp; Year of Exam</td><td><%= exam_month %> / <%= exam_year %></td></tr>
+        <tr><td class="label">Exam Type</td><td><%= exam_type %></td></tr>
+      </table>
+    </div>
+
+    <div class="photo-box">
+      <% if (photoDataUrl) { %>
+        <img src="<%= photoDataUrl %>">
+      <% } else { %>
+        Photo<br>Not<br>Uploaded
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Subjects (2-col) -->
+  <div class="subjects-container">
+    <table class="subjects-table">
+      <tr><th>S.No</th><th>Code</th><th>Subject</th></tr>
+      <% left.forEach((s, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= s.code %></td>
+          <td><%= s.name %></td>
+        </tr>
+      <% }) %>
+    </table>
+
+    <table class="subjects-table">
+      <tr><th>S.No</th><th>Code</th><th>Subject</th></tr>
+      <% right.forEach((s, j) => { %>
+        <tr>
+          <td><%= j + half + 1 %></td>
+          <td><%= s.code %></td>
+          <td><%= s.name %></td>
+        </tr>
+      <% }) %>
+    </table>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <div class="instructions-title">Instructions to Candidates</div>
+    <ol>
+      <li>Display his/her ID card for verification.</li>
+      <li>The candidate has to confirm himself/herself that he/she does not possess any foreign material,
+          electronic gadgets other than electronic calculator.</li>
+      <li>Candidates should stay in the examination hall at least half-an-hour from the commencement of the examination.</li>
+      <li>Be present in the examination hall 15 minutes before the time of commencement of examination.
+          No candidate will be allowed after the commencement of the examination.</li>
+    </ol>
+  </div>
+
+  <div class="sign-row">
+    <div class="sign-box">
+      <div class="sign-line"></div>
+      Signature of Candidate
+    </div>
+    <div class="sign-box">
+      <div class="sign-line"></div>
+      Controller of Examinations
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE 3: DUPLICATE HALL TICKET ===================== -->
+<div class="page">
+  <img class="watermark"
+       src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png">
+
+  <%
+    pageType = "Duplicate";
+  %>
+
+  <div class="header-box">
+    <!-- Left logo -->
+    <img src="https://www.facultyplus.com/wp-content/uploads/2024/12/MITS-Logo.png"
+         style="position:absolute;left:12px;top:12px;width:55px;height:55px;object-fit:contain;">
+
+    <!-- Right reg/branch box -->
+    <div style="
+         position:absolute;
+         right:12px;
+         top:12px;
+         border:1px solid #000;
+         padding:4px 10px;
+         background:white;
+         text-align:center;">
+      <div><%= regulation %></div>
+      <div><%= shortDept %></div>
+    </div>
+
+    <!-- Header text -->
+    <div style="text-align:center;line-height:1.35;">
+      <% if (mode === "University") { %>
+        <div class="univ-title">MITS – DEEMED TO BE UNIVERSITY</div>
+        <div>(Declared as Deemed to be University under UGC Act)</div>
+        <div>MADANAPALLE – 517325, ANDHRA PRADESH</div>
+      <% } else { %>
+        <div class="inst-name">MADANAPALLE INSTITUTE OF TECHNOLOGY &amp; SCIENCE</div>
+        <div>(UGC – AUTONOMOUS INSTITUTION)</div>
+        <div>MADANAPALLE – 517325 (A.P)</div>
+        <div>(Affiliated to JNTUA, Ananthapuramu &amp; Approved by AICTE, New Delhi)</div>
+      <% } %>
+
+      <div class="title-line">Hall Ticket – <%= pageType %></div>
+    </div>
+  </div>
+
+  <!-- Candidate + photo -->
+  <div class="info-row">
+    <div class="info-left">
+      <table class="details-table">
+        <tr><td class="label">Hall Ticket No.</td><td><%= roll_number %></td></tr>
+        <tr><td class="label">Name</td><td><%= name %></td></tr>
+        <tr><td class="label">Father's Name</td><td><%= father_name %></td></tr>
+        <tr><td class="label">Month &amp; Year of Exam</td><td><%= exam_month %> / <%= exam_year %></td></tr>
+        <tr><td class="label">Exam Type</td><td><%= exam_type %></td></tr>
+      </table>
+    </div>
+
+    <div class="photo-box">
+      <% if (photoDataUrl) { %>
+        <img src="<%= photoDataUrl %>">
+      <% } else { %>
+        Photo<br>Not<br>Uploaded
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Subjects (2-col) -->
+  <div class="subjects-container">
+    <table class="subjects-table">
+      <tr><th>S.No</th><th>Code</th><th>Subject</th></tr>
+      <% left.forEach((s, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= s.code %></td>
+          <td><%= s.name %></td>
+        </tr>
+      <% }) %>
+    </table>
+
+    <table class="subjects-table">
+      <tr><th>S.No</th><th>Code</th><th>Sub
+ject</th></tr>
+      <% right.forEach((s, j) => { %>
+        <tr>
+          <td><%= j + half + 1 %></td>
+          <td><%= s.code %></td>
+          <td><%= s.name %></td>
+        </tr>
+      <% }) %>
+    </table>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <div class="instructions-title">Instructions to Candidates</div>
+    <ol>
+      <li>Display his/her ID card for verification.</li>
+      <li>The candidate has to confirm himself/herself that he/she does not possess any foreign material,
+          electronic gadgets other than electronic calculator.</li>
+      <li>Candidates should stay in the examination hall at least half-an-hour from the commencement of the examination.</li>
+      <li>Be present in the examination hall 15 minutes before the time of commencement of examination.
+          No candidate will be allowed after the commencement of the examination.</li>
+    </ol>
+  </div>
+
+  <div class="sign-row">
+    <div class="sign-box">
+      <div class="sign-line"></div>
+      Signature of Candidate
+    </div>
+    <div class="sign-box">
+      <div class="sign-line"></div>
+      Controller of Examinations
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

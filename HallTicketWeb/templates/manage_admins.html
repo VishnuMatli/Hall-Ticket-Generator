@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+        <h2 class="text-white mb-4 text-center">Admin Access Control</h2>
+
+        <!-- Register New Admin Card -->
+        <div class="glass-card mb-4">
+            <h5 class="text-info mb-3"><i class="fas fa-user-plus me-2"></i>Register New Admin</h5>
+            <form method="POST" class="row g-3 align-items-end">
+                <div class="col-12 col-md-5">
+                    <label class="small text-muted mb-1">USERNAME</label>
+                    <input type="text" name="new_username" class="form-control" placeholder="New Username" required autocomplete="off">
+                </div>
+                <div class="col-12 col-md-5">
+                    <label class="small text-muted mb-1">PASSWORD</label>
+                    <input type="password" name="new_password" class="form-control" placeholder="New Password" required>
+                </div>
+                <div class="col-12 col-md-2 mt-3 mt-md-0">
+                    <button class="btn btn-neon w-100">Add</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Admin List Table -->
+        <div class="glass-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-glass table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Admin User</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins %}
+                        <tr>
+                            <!-- Username Column (admin[0] is username) -->
+                            <td class="ps-4 fw-bold">
+                                <i class="fas fa-user-shield me-2 text-warning"></i> {{ admin[0] }}
+                                {% if admin[0] == session['user'] %}
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success ms-2">YOU</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Status Column (admin[1] is is_locked) -->
+                            <td>
+                                {% if admin[1] == 1 %}
+                                    <span class="badge bg-danger text-white border border-danger blink-animation">
+                                        <i class="fas fa-lock me-1"></i> LOCKED
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success bg-opacity-25 text-success border border-success">
+                                        Active
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Actions Column -->
+                            <td class="text-end pe-4">
+                                <!-- UNLOCK BUTTON (Only shows if locked) -->
+                                {% if admin[1] == 1 %}
+                                    <form method="POST" style="display:inline;">
+                                        <input type="hidden" name="unlock_user" value="{{ admin[0] }}">
+                                        <button class="btn btn-sm btn-outline-warning px-3 rounded-pill me-1">
+                                            <i class="fas fa-unlock-alt"></i> Unlock
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                <!-- REMOVE BUTTON (Cannot remove self) -->
+                                {% if admin[0] != session['user'] %}
+                                    <form method="POST" style="display:inline;" onsubmit="return confirm('Revoke access for {{admin[0]}}?');">
+                                        <input type="hidden" name="delete_user" value="{{ admin[0] }}">
+                                        <button class="btn btn-sm btn-outline-danger px-3 rounded-pill">
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <button class="btn btn-sm btn-outline-secondary px-3 rounded-pill" disabled>Protected</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Blink animation for the LOCKED badge */
+    @keyframes blink { 50% { opacity: 0.5; } }
+    .blink-animation { animation: blink 1.5s infinite; }
+</style>
+{% endblock %}

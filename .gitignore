@@ -1,0 +1,5 @@
+.env
+hallenv/
+node_modules/
+public/
+uploads/

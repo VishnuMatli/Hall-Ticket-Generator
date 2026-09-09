@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md-6">
+        <h2 class="text-white m-0">Subject Management</h2>
+    </div>
+    <div class="col-12 col-md-6 text-md-end">
+        <button class="btn btn-neon mb-2 mb-md-0 me-md-2 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#subjectModal" 
+                onclick="document.getElementById('formSubject').reset(); document.getElementById('editId').value='';">
+            <i class="fas fa-plus me-2"></i>Add Subject
+        </button>
+        <button class="btn btn-outline-light mb-2 mb-md-0 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="fas fa-file-upload me-2"></i>Import
+        </button>
+        <a href="{{ url_for('subjects_sample_csv') }}" class="btn btn-outline-info w-100 w-md-auto">
+            <i class="fas fa-download me-2"></i>Sample CSV
+        </a>
+    </div>
+</div>
+
+<form class="glass-card row g-3 mb-4 align-items-center" method="GET">
+    <div class="col-6 col-md-3">
+        <select name="dept" class="form-select">
+            <option value="">Filter by Dept</option>
+            {% for d in depts %}<option value="{{d}}" {% if request.args.get('dept')==d %}selected{% endif %}>{{d}}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-6 col-md-3">
+        <select name="sem" class="form-select">
+            <option value="">Filter by Sem</option>
+            {% for s in sems %}<option value="{{s}}" {% if request.args.get('sem')==s %}selected{% endif %}>{{s}}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-6 col-md-2">
+        <select name="year" class="form-select">
+            <option value="">Year</option>
+            {% for y in years %}<option value="{{y}}" {% if request.args.get('year')==y|string %}selected{% endif %}>{{y}}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="input-group">
+            <span class="input-group-text bg-transparent text-white border-secondary"><i class="fas fa-search"></i></span>
+            <input type="text" name="search" class="form-control" placeholder="Search Code or Name" value="{{ request.args.get('search', '') }}">
+        </div>
+    </div>
+    <div class="col-12 col-md-2">
+        <button class="btn btn-info w-100 fw-bold">Filter</button>
+    </div>
+</form>
+
+<div class="glass-card p-0 overflow-hidden">
+    <div class="table-responsive bg-transparent">
+        <table class="table table-glass table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">Code</th>
+                    <th>Subject Name</th>
+                    <th>Dept</th>
+                    <th>Sem</th>
+                    <th>Reg</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in subjects %}
+                <tr>
+                    <td class="ps-4"><span class="badge bg-info bg-opacity-25 border border-info text-info text-nowrap">{{s[4]}}</span></td>
+                    <td class="fw-bold text-nowrap">{{s[5]}}</td>
+                    <td class="text-muted">{{s[1]}}</td>
+                    <td>{{s[3]}}</td>
+                    <td>{{s[2]}}</td>
+                    <td class="text-end pe-4 text-nowrap">
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#subjectModal"
+                                onclick="fillModal('subjectModal', {
+                                    edit_id: '{{s[0]}}', 
+                                    department: '{{s[1]}}', 
+                                    regulation: '{{s[2]}}', 
+                                    semester: '{{s[3]}}', 
+                                    subject_code: '{{s[4]}}', 
+                                    subject_name: '{{s[5]}}'
+                                })"><i class="fas fa-edit"></i></button>
+                        <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this subject?');">
+                            <input type="hidden" name="delete_id" value="{{s[0]}}">
+                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center py-4 text-muted">No subjects found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="subjectModal">
+    <div class="modal-dialog">
+        <form method="POST" class="modal-content glass-card p-0" id="formSubject">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-info">Subject Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="edit_id" id="editId">
+                <div class="mb-3">
+                    <label class="small text-muted">Department</label>
+                    <select name="department" class="form-select" required>{% for d in depts %}<option>{{d}}</option>{% endfor %}</select>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="small text-muted">Semester</label>
+                        <select name="semester" class="form-select" required>{% for s in sems %}<option>{{s}}</option>{% endfor %}</select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="small text-muted">Regulation</label>
+                        <select name="regulation" class="form-select" required>{% for r in regs %}<option>{{r}}</option>{% endfor %}</select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="small text-muted">Subject Code</label>
+                    <input type="text" name="subject_code" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="small text-muted">Subject Name</label>
+                    <input type="text" name="subject_name" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button class="btn btn-neon w-100">Save Subject</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal">
+    <div class="modal-dialog">
+        <form method="POST" enctype="multipart/form-data" class="modal-content glass-card p-0">
+            <div class="modal-header border-bottom-0"><h5>Import Subjects</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <input type="file" name="import_file" class="form-control" accept=".csv,.xlsx"
+                       onchange="validateCsv(this, 'subjects', 'subjectsCsvValidationResult')" required>
+                <div id="subjectsCsvValidationResult" class="mt-2 small"></div>
+                <div class="mt-2 text-muted small"><i class="fas fa-info-circle me-1"></i>Req Columns: department, regulation, semester, subject_code, subject_name</div>
+            </div>
+            <div class="modal-footer border-top-0"><button class="btn btn-success w-100">Upload Data</button></div>
+        </form>
+    </div>
+</div>
+{% endblock %}

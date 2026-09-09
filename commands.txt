@@ -1,0 +1,22 @@
+source hallenv/bin/activate
+
+npm start
+
+cd HallTicketWeb && python app.py
+
+admin
+admin123
+
+vishnu
+0407
+
+sudo ss -tulpn | grep :<portnumber>
+kill <pid>
+
+mysql -h 127.0.0.1 -P 3306 -u root -p'0407' hall_ticket_db_university
+
+export GROQ_API_KEY="REDACTED_GROQ_API_KEY" 
+# Optional: pin a model you know is supported
+# export GROQ_MODEL="llama-3.3-70b-versatile"
+streamlit run app2.py
+

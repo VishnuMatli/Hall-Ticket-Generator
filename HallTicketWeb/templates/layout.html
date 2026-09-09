@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MITS Halltickets Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- GLOBAL ANIMATED BACKGROUND --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #000000, #1a1a2e, #16213e, #0f3460);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- VISIBILITY FIXES --- */
+        .text-muted { color: rgba(255, 255, 255, 0.75) !important; }
+        .small.text-muted { color: rgba(255, 255, 255, 0.65) !important; }
+        .form-label { color: #e0e0e0; font-weight: 500; }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+        /* --- GLASSMORPHISM COMPONENTS --- */
+        .glass-sidebar {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 100vh;
+            width: 260px;
+            transition: all 0.3s ease-in-out;
+            z-index: 1050;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        /* --- NEON TYPOGRAPHY & BUTTONS --- */
+        h2, h3, h4, h5 {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.85);
+            padding: 15px 20px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-neon {
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+            transition: 0.3s;
+        }
+
+        .btn-neon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
+            color: white;
+        }
+
+        /* --- CUSTOM TABLES --- */
+        .table-glass {
+            color: #ffffff;
+            border-color: rgba(255,255,255,0.15);
+            vertical-align: middle;
+        }
+        .table-glass th {
+            background: rgba(255,255,255,0.1);
+            color: #00d4ff;
+            border: none;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .table-glass td {
+            background: transparent;
+            color: #f0f0f0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .table-hover tbody tr:hover td {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+        }
+
+        /* --- FORMS --- */
+        .form-control, .form-select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(0, 0, 0, 0.6);
+            border-color: #00d4ff;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+        option { background: #16213e; color: white; }
+
+        /* --- MODALS --- */
+        .modal-content {
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+        .btn-close { filter: invert(1); }
+
+        /* --- MOBILE LAYOUT --- */
+        .mobile-header { display: none; }
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1040;
+            backdrop-filter: blur(3px);
+        }
+
+        @media (max-width: 991px) {
+            .mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px;
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                position: sticky; top: 0; z-index: 1030;
+            }
+            
+            .glass-sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px; 
+                height: 100%;
+                background: #0f1525;
+            }
+
+            .glass-sidebar.show { left: 0; }
+            .sidebar-overlay.show { display: block; }
+            .main-content { padding: 15px !important; }
+            .table-glass { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-header">
+    <div class="d-flex align-items-center">
+        <button class="btn btn-outline-light border-0 me-3" onclick="toggleSidebar()">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+        <h4 class="m-0 text-info"><i class="fas fa-atom me-2"></i>ADMIN</h4>
+    </div>
+    <a href="/logout" class="btn btn-sm btn-outline-danger border-0">
+        <i class="fas fa-sign-out-alt"></i>
+    </a>
+</div>
+
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="d-flex">
+    <div class="glass-sidebar d-flex flex-column flex-shrink-0 p-3" id="sidebar">
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+            <h3 class="text-center w-100 m-0 d-none d-lg-block" style="color: #00d4ff;">
+                <i class="fas fa-atom me-2"></i>ADMIN
+            </h3>
+            <h4 class="d-lg-none text-info m-0">Menu</h4>
+            <button class="btn btn-sm btn-outline-light d-lg-none border-0" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}"><i class="fas fa-home me-3"></i>Dashboard</a></li>
+            <li><a href="/departments" class="nav-link {% if request.path == '/departments' %}active{% endif %}"><i class="fas fa-building me-3"></i>Departments</a></li>
+            <li><a href="/students" class="nav-link {% if request.path == '/students' %}active{% endif %}"><i class="fas fa-user-graduate me-3"></i>Students</a></li>
+            <li><a href="/backlogs" class="nav-link {% if request.path == '/backlogs' or request.path.startswith('/backlogs/') %}active{% endif %}"><i class="fas fa-history me-3"></i>Backlogs</a></li>
+            <li><a href="/backlogs-report" class="nav-link {% if request.path == '/backlogs-report' %}active{% endif %}"><i class="fas fa-chart-bar me-3"></i>Backlogs Report</a></li>
+            <li><a href="/hallticket-approvals" class="nav-link {% if request.path == '/hallticket-approvals' %}active{% endif %}"><i class="fas fa-ticket-alt me-3"></i>Hallticket Approvals</a></li>
+            <li><a href="/attendance" class="nav-link {% if request.path == '/attendance' %}active{% endif %}"><i class="fas fa-user-check me-3"></i>Attendance</a></li>
+            <li><a href="/fees" class="nav-link {% if request.path == '/fees' %}active{% endif %}"><i class="fas fa-rupee-sign me-3"></i>Fee Management</a></li>
+            <li><a href="/exam-fees" class="nav-link {% if request.path == '/exam-fees' %}active{% endif %}"><i class="fas fa-file-invoice-dollar me-3"></i>Exam Fee Rules</a></li>
+            <li><a href="/subjects" class="nav-link {% if request.path == '/subjects' %}active{% endif %}"><i class="fas fa-book me-3"></i>Subjects</a></li>
+            <li><a href="/promote" class="nav-link {% if request.path == '/promote' %}active{% endif %}"><i class="fas fa-level-up-alt me-3"></i>Promotions</a></li>
+            <li><a href="/manage_admins" class="nav-link {% if request.path == '/manage_admins' %}active{% endif %}"><i class="fas fa-users-cog me-3"></i>Manage Admins</a></li>
+        </ul>
+        <hr style="border-color: rgba(255,255,255,0.3);">
+        
+        <button class="btn btn-outline-info w-100 mb-2" data-bs-toggle="modal" data-bs-target="#passwordModal">
+            <i class="fas fa-key me-2"></i>Pass Change
+        </button>
+    </div>
+
+    <div class="flex-grow-1 p-4 main-content position-relative" style="height: 100vh; overflow-y: auto;">
+        
+        <div class="d-none d-lg-flex justify-content-end mb-2">
+            <a href="/logout" class="btn btn-outline-danger btn-sm px-3 rounded-pill shadow-sm" style="backdrop-filter: blur(5px);">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show glass-card py-2" role="alert" style="border-left: 5px solid {{ '#00d4ff' if category=='success' else '#ff6b6b' }}; color: #fff;">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<div class="modal fade" id="passwordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="/change_password" class="modal-content glass-card p-0">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title">Secure Password Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Current Password</label>
+                <input type="password" name="old_password" class="form-control mb-3" required>
+                <label class="form-label">New Password</label>
+                <input type="password" name="new_password" class="form-control mb-3" required>
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" name="confirm_password" class="form-control" required>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button class="btn btn-neon w-100">Update Credentials</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/csv_validate.js') }}"></script>
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('show');
+        document.querySelector('.sidebar-overlay').classList.toggle('show');
+    }
+
+    function fillModal(modalId, data) {
+        const modal = document.getElementById(modalId);
+        for (const [key, value] of Object.entries(data)) {
+            const input = modal.querySelector(`[name="${key}"]`);
+            if (input) {
+                if(input.type === 'date' && value) {
+                   input.value = value;
+                } else {
+                   input.value = value;
+                }
+            }
+        }
+    }
+</script>
+</body>
+</html>
